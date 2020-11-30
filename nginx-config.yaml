@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: nginx-config
   namespace: default
+  labels:
+    tier: backend
 data:
   default.conf: |
     server {
@@ -17,7 +19,7 @@ data:
         }
 
         location ~ ^(.+.\.php)(/|$) {
-            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_pass php-fpm-service:9000;
             fastcgi_split_path_info ^(.+\.php)(/.*)$;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
