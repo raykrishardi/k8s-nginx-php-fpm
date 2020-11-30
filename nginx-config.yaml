@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  default.conf: |
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+        root /srv/app;
+        index index.php index.html;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        location ~ ^(.+.\.php)(/|$) {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+
+        error_log  /var/log/nginx/error.log;
+        access_log /var/log/nginx/access.log;
+    }
