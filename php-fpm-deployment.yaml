@@ -44,6 +44,26 @@ spec:
         volumeMounts:
         - name: www-storage
           mountPath: /srv/app/
+        
+        # Init file using container lifecycle hooks
+        # postStart -> after the container has started
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "echo '<?php echo phpinfo(); ?>' > /srv/app/index.php"]
+      
+      # Init file using init containers
+      initContainers:
+      - name: install
+        image: busybox
+        volumeMounts:
+        - name: www-storage
+          mountPath: /srv/app/
+        command:
+        - wget
+        - "-O"
+        - "/srv/app/info.php"
+        - https://raw.githubusercontent.com/do-community/php-kubernetes/master/index.php
       
       volumes:
       - name: www-storage
